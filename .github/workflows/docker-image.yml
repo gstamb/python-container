@@ -37,7 +37,7 @@ jobs:
       - name: Debug Harbor URL
         run: |
           echo "HARBOR_URL: $HARBOR_URL"
-          echo "Docker Tag: ${{ vars.HARBOR_PASSWORD }}/flask_cicd/hello-flask:latest"
+          echo "Docker Tag: $HARBOR_URL/flask_cicd/hello-flask:latest"
 
       # Build the Docker Image
       - name: Build the Docker image
