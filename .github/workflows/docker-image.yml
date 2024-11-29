@@ -39,9 +39,10 @@ jobs:
           echo "HARBOR_URL: $HARBOR_URL"
           echo "Docker Tag: $HARBOR_URL/flask_cicd/hello-flask:latest"
 
-      # Build the Docker Image
+      # Build the Docker Image (adjust build context and Dockerfile path)
       - name: Build the Docker image
-        run: docker build -t $HARBOR_URL/flask_cicd/hello-flask:latest .
+        run: docker build -t $HARBOR_URL/flask_cicd/hello-flask:latest -f python-flask/Dockerfile python-flask/
+
 
       # Push the Docker Image
       - name: Push the Docker image
