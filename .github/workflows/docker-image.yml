@@ -3,7 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main   
+      - main
 
 jobs:
   build:
@@ -15,29 +15,34 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Set Harbor credentials and URL using GITHUB_ENV
+      - name: Set Harbor Environment Variables
+        run: |
+          echo "HARBOR_USERNAME=${{ secrets.HARBOR_USERNAME }}" >> $GITHUB_ENV
+          echo "HARBOR_PASSWORD=${{ secrets.HARBOR_PASSWORD }}" >> $GITHUB_ENV
+          echo "HARBOR_URL=${{ secrets.HARBOR_URL }}" >> $GITHUB_ENV
+
       # Log in to Harbor Registry
       - name: Log in to Harbor registry
-        env:
-          HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
-          HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
-          HARBOR_URL: ${{ secrets.HARBOR_URL }}
         run: |
           echo "${HARBOR_PASSWORD}" | docker login "${HARBOR_URL}" --username "${HARBOR_USERNAME}" --password-stdin
 
+      # Debug Docker Tag
       - name: Debug Docker Tag
         run: |
-          DOCKER_TAG="${{ secrets.HARBOR_URL }}/flask_cicd/hello-flask:latest"
+          DOCKER_TAG="${HARBOR_URL}/flask_cicd/hello-flask:latest"
           echo "Docker Tag: $DOCKER_TAG"
 
+      # Debug Harbor URL
       - name: Debug Harbor URL
         run: |
-          echo "HARBOR_URL: ${{ secrets.HARBOR_URL }}"
-          echo "Docker Tag: ${{ secrets.HARBOR_URL }}/flask_cicd/hello-flask:latest"
+          echo "HARBOR_URL: $HARBOR_URL"
+          echo "Docker Tag: $HARBOR_URL/flask_cicd/hello-flask:latest"
 
       # Build the Docker Image
       - name: Build the Docker image
-        run: docker build -t ${{ secrets.HARBOR_URL }}/flask_cicd/hello-flask:latest .
+        run: docker build -t $HARBOR_URL/flask_cicd/hello-flask:latest .
 
       # Push the Docker Image
       - name: Push the Docker image
-        run: docker push ${{ secrets.HARBOR_URL }}/flask_cicd/hello-flask:latest
+        run: docker push $HARBOR_URL/flask_cicd/hello-flask:latest
