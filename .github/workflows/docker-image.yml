@@ -8,14 +8,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: python-project  # Specify the environment
+    environment: python-project
 
     steps:
-      # Step 1: Checkout the code from the repository
+      # Checkout Code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Log in to Harbor registry
+      # Log in to Harbor Registry
       - name: Log in to Harbor registry
         env:
           HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
@@ -24,10 +24,14 @@ jobs:
         run: |
           echo "${HARBOR_PASSWORD}" | docker login "${HARBOR_URL}" --username "${HARBOR_USERNAME}" --password-stdin
 
-      # Step 3: Build the Docker image
+      # Debug Docker Tag (Temporary Step)
+      - name: Debug Docker Tag
+        run: echo "Docker Tag: ${{ secrets.HARBOR_URL }}/flask_cicd/hello-flask:latest"
+
+      # Build the Docker Image
       - name: Build the Docker image
         run: docker build -t ${{ secrets.HARBOR_URL }}/flask_cicd/hello-flask:latest .
 
-      # Step 4: Push the Docker image to Harbor
+      # Push the Docker Image
       - name: Push the Docker image
         run: docker push ${{ secrets.HARBOR_URL }}/flask_cicd/hello-flask:latest
