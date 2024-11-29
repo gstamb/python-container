@@ -13,14 +13,14 @@ jobs:
     steps:
       # Checkout Code
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Set Harbor credentials and URL using GITHUB_ENV
       - name: Set Harbor Environment Variables
         run: |
           echo "HARBOR_USERNAME=${{ secrets.HARBOR_USERNAME }}" >> $GITHUB_ENV
           echo "HARBOR_PASSWORD=${{ secrets.HARBOR_PASSWORD }}" >> $GITHUB_ENV
-          echo "HARBOR_URL=${{ secrets.HARBOR_URL }}" >> $GITHUB_ENV
+          echo "HARBOR_URL=${{ vars.HARBOR_URL }}" >> $GITHUB_ENV
 
       # Log in to Harbor Registry
       - name: Log in to Harbor registry
