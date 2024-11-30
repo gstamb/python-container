@@ -8,26 +8,33 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: python-project  # Restore the environment declaration
+
     steps:
+      # Checkout Code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Set Harbor Environment Variables
       - name: Set Harbor Environment Variables
         run: |
           echo "HARBOR_USERNAME=${{ secrets.HARBOR_USERNAME }}" >> $GITHUB_ENV
           echo "HARBOR_PASSWORD=${{ secrets.HARBOR_PASSWORD }}" >> $GITHUB_ENV
           echo "HARBOR_URL=${{ vars.HARBOR_URL }}" >> $GITHUB_ENV
 
+      # Log in to Harbor Registry
       - name: Log in to Harbor registry
         run: |
           echo "${{ secrets.HARBOR_PASSWORD }}" | docker login $HARBOR_URL --username "${{ secrets.HARBOR_USERNAME }}" --password-stdin
 
+      # Set Image Tag based on Git commit hash
       - name: Set Image Tag
         run: echo "IMAGE_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
+      # Build Docker Image
       - name: Build the Docker image
         run: docker build -t $HARBOR_URL/flask_cicd/hello-flask:$IMAGE_TAG -f python-flask/Dockerfile python-flask/
 
+      # Push the Docker Image
       - name: Push the Docker image
         run: docker push $HARBOR_URL/flask_cicd/hello-flask:$IMAGE_TAG
-
