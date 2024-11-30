@@ -8,42 +8,26 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: python-project
-
     steps:
-      # Checkout Code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Set Harbor credentials and URL using GITHUB_ENV
       - name: Set Harbor Environment Variables
         run: |
           echo "HARBOR_USERNAME=${{ secrets.HARBOR_USERNAME }}" >> $GITHUB_ENV
           echo "HARBOR_PASSWORD=${{ secrets.HARBOR_PASSWORD }}" >> $GITHUB_ENV
           echo "HARBOR_URL=${{ vars.HARBOR_URL }}" >> $GITHUB_ENV
 
-      # Log in to Harbor Registry
       - name: Log in to Harbor registry
         run: |
           echo "${{ secrets.HARBOR_PASSWORD }}" | docker login $HARBOR_URL --username "${{ secrets.HARBOR_USERNAME }}" --password-stdin
 
-      # Debug Docker Tag
-      - name: Debug Docker Tag
-        run: |
-          DOCKER_TAG="${{ vars.HARBOR_PASSWORD }}/flask_cicd/hello-flask:latest"
-          echo "Docker Tag: $DOCKER_TAG"
+      - name: Set Image Tag
+        run: echo "IMAGE_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-      # Debug Harbor URL
-      - name: Debug Harbor URL
-        run: |
-          echo "HARBOR_URL: $HARBOR_URL"
-          echo "Docker Tag: $HARBOR_URL/flask_cicd/hello-flask:latest"
-
-      # Build the Docker Image (adjust build context and Dockerfile path)
       - name: Build the Docker image
-        run: docker build -t $HARBOR_URL/flask_cicd/hello-flask:latest -f python-flask/Dockerfile python-flask/
+        run: docker build -t $HARBOR_URL/flask_cicd/hello-flask:$IMAGE_TAG -f python-flask/Dockerfile python-flask/
 
-
-      # Push the Docker Image
       - name: Push the Docker image
-        run: docker push $HARBOR_URL/flask_cicd/hello-flask:latest
+        run: docker push $HARBOR_URL/flask_cicd/hello-flask:$IMAGE_TAG
+
